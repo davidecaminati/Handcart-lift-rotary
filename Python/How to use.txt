@@ -1,0 +1,10 @@
+Login into Raspberry with some terminal (ie. like Putty)
+
+--go into directory with source code
+cd opencv-2.4.10/samples/python2/
+--use the virtual environment
+workon cv
+-- export the display to the raspberry monitor attached
+export DISPLAY=:0.0
+-- run the video capture with neural network processing
+./digits_video.py
