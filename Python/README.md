@@ -27,9 +27,9 @@ sudo python get-pip.py
 sudo pip install virtualenv virtualenvwrapper
 
 ###Then, update your ~/.profile  file to include the following lines:
-nano ~/.profile
-export WORKON_HOME=$HOME/.virtualenvs
-source /usr/local/bin/virtualenvwrapper.sh
+nano ~/.profile  
+export WORKON_HOME=$HOME/.virtualenvs  
+source /usr/local/bin/virtualenvwrapper.sh  
 
 source ~/.profile
 
@@ -39,7 +39,7 @@ sudo apt-get install python2.7-dev
 
 pip install numpy
 
-wget -O opencv-2.4.10.zip http://sourceforge.net/projects/opencvlibrary/files/opencv-unix/2.4.10/opencv-2.4.10.zip/download
+wget -O opencv-2.4.10.zip http://sourceforge.net/projects/opencvlibrary/files/opencv-unix/2.4.10/opencv-2.4.10.zip/download  
 unzip opencv-2.4.10.zip
 cd opencv-2.4.10
 
@@ -58,8 +58,8 @@ ln -s /usr/local/lib/python2.7/site-packages/cv.py cv.py
 
 
 ### Test it!
-workon cv
-python
->>> import cv2
->>> cv2.__version__
+workon cv  
+python  
+import cv2  
+cv2.__version__  
 '2.4.10'
