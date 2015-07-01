@@ -1,6 +1,7 @@
-using raspberry 2
+Install OpenCV on raspberry 2
 =======
 follow this guide to install OpenCV (thanks to Adrian Rosebrock)
+-----------
 http://www.pyimagesearch.com/2015/02/23/install-opencv-and-python-on-your-raspberry-pi-2-and-b/
 -----------
 
@@ -25,9 +26,8 @@ sudo python get-pip.py
 
 sudo pip install virtualenv virtualenvwrapper
 
-Then, update your ~/.profile  file to include the following lines:
+###Then, update your ~/.profile  file to include the following lines:
 nano ~/.profile
-# virtualenv and virtualenvwrapper
 export WORKON_HOME=$HOME/.virtualenvs
 source /usr/local/bin/virtualenvwrapper.sh
 
@@ -56,6 +56,8 @@ cd ~/.virtualenvs/cv/lib/python2.7/site-packages/
 ln -s /usr/local/lib/python2.7/site-packages/cv2.so cv2.so
 ln -s /usr/local/lib/python2.7/site-packages/cv.py cv.py
 
+
+### Test it!
 workon cv
 python
 >>> import cv2
