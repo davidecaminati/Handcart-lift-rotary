@@ -40,7 +40,7 @@ sudo apt-get install python2.7-dev
 pip install numpy
 
 wget -O opencv-2.4.10.zip http://sourceforge.net/projects/opencvlibrary/files/opencv-unix/2.4.10/opencv-2.4.10.zip/download  
-unzip opencv-2.4.10.zip
+unzip opencv-2.4.10.zip  
 cd opencv-2.4.10
 
 mkdir build
@@ -49,12 +49,12 @@ cmake -D CMAKE_BUILD_TYPE=RELEASE -D CMAKE_INSTALL_PREFIX=/usr/local -D BUILD_NE
 
 make
 
-sudo make install
+sudo make install  
 sudo ldconfig
 
-cd ~/.virtualenvs/cv/lib/python2.7/site-packages/
-ln -s /usr/local/lib/python2.7/site-packages/cv2.so cv2.so
-ln -s /usr/local/lib/python2.7/site-packages/cv.py cv.py
+cd ~/.virtualenvs/cv/lib/python2.7/site-packages/  
+ln -s /usr/local/lib/python2.7/site-packages/cv2.so cv2.so  
+ln -s /usr/local/lib/python2.7/site-packages/cv.py cv.py  
 
 
 ### Test it!
