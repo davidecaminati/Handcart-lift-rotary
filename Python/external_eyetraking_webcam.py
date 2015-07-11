@@ -1,6 +1,6 @@
 # Detection of simple eye movement using Raspberry PI 2 and a cheap webcam
 # developed based on example by Adrian Rosebrock (http://www.pyimagesearch.com/author/adrian/)
-# writed by Davide Caminati 11/07/2015 (http://caminatidavide.it/)
+# writed by Davide Caminati 07/11/2015 (http://caminatidavide.it/)
 # License GNU GPLv2
 
 # USAGE
@@ -19,10 +19,8 @@ import cv2
 # moltiplicator must be connected with effective resolution change from FirstFase and SecondFase proportions
 # FirstFase must identify correctly the eye position (no false positive)
 # add recognition procerute (hug, nn, whatelse)
-# remove italian words
 # test improvement of multi core capability (probably we don't need this)
 # provide change of resolution of fase 1 and fase 2 as parameter (think about this)
-# create a repository on github
 
 
 #NOTE
@@ -159,7 +157,7 @@ print "fase 1 ended"
 #camera.release()
 
 #wait the camera stop
-time.sleep(1)
+#time.sleep(1)
 
 #rstart camera
 #camera = cv2.VideoCapture(0)
@@ -186,7 +184,7 @@ if resolution2 == 3:
 min_rect = r2/3*2
 old_end = 1.0
 old_number = number
-ottimizzato = 0
+optimized = 0
 best_minrect_array = [0] * 500
 
 print "fase 2 started"
@@ -196,8 +194,7 @@ while number<100:
     (grabbed, image) = camera.read()
     # grab the raw NumPy array representing the image
     
-    # check to see if we have reached the end of the
-    # video
+    # check to see if we have reached the end of the video in case of video file
     if not grabbed:
         print "break 2"
         break
@@ -237,17 +234,17 @@ while number<100:
     if usa_ottimizzazione_statica:
         # static optimization
         if (elapsed_time < old_end) & (old_number <> number) :
-            if ottimizzato < 50 :
-                ottimizzato +=1
+            if optimized < 50 :
+                optimized +=1
                 min_rect +=int(min_rect/100*10) +3
                 
         else:
-            if ottimizzato < 50:
+            if optimized < 50:
                 min_rect -=int(min_rect/100*10) +3
         # after last update take some margin and fix the value of min_rect for future recognition    
-        if ottimizzato == 49:
+        if optimized == 49:
             min_rect -= int(min_rect*5/100)
-            ottimizzato = 1000
+            optimized = 1000
     else:
         # dinamic optimization
         if (elapsed_time < old_end) & (old_number <> number) :
@@ -275,7 +272,7 @@ print number_of_good_min_rect
 best_min_rect = best_minrect_array.index(number_of_good_min_rect)
 print best_min_rect
 
-# release resource unnecessary
+# release resource 
 best_minrect_array = []
 
 if number_of_good_min_rect > 25:
@@ -285,7 +282,7 @@ if number_of_good_min_rect > 25:
     #setting of all the variable
     min_rect = best_min_rect
     tollerance = 0.5
-    moltiplicator = 1
+    moltiplicator = 1 # it depends on the different resolution from fase 1 and fase 2
     rr0 = int(r0*(1-tollerance)) * moltiplicator
     rr1 = int(r1*(1-tollerance)) * moltiplicator
     rr2 = int(r2*(1+tollerance)) * moltiplicator
@@ -295,8 +292,7 @@ if number_of_good_min_rect > 25:
         start = time.time()
         (grabbed, image) = camera.read()
         
-        # check to see if we have reached the end of the
-        # video
+        # check to see if we have reached the end of the video in case of video file
         if not grabbed:
             print "break 3"
             break
