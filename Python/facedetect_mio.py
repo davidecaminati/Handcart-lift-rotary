@@ -48,7 +48,7 @@ def draw_rects(img, rects, color):
 if __name__ == '__main__':
     import sys, getopt
     
-    print help_message
+    #print help_message
     
 
     args, video_src = getopt.getopt(sys.argv[1:], '', ['cascade=', 'nested-cascade='])

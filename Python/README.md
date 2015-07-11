@@ -63,3 +63,32 @@ python
 import cv2  
 cv2.__version__  
 '2.4.10'
+
+### install git
+sudo apt-get install git
+
+### clone the repository inside home directory
+cd ~
+git clone https://github.com/davidecaminati/Handcart-lift-rotary
+
+### link some file 
+ln Handcart-lift-rotary/Python/facedetect_mio.py opencv-2.4.10/samples/python2/
+ln Handcart-lift-rotary/Python/digits.py opencv-2.4.10/samples/python2/
+ln Handcart-lift-rotary/Python/digits_video_v2.py opencv-2.4.10/samples/python2/
+ln Handcart-lift-rotary/Python/facedetect_mio_detect_cyrcle.py opencv-2.4.10/samples/python2/
+ln Handcart-lift-rotary/Python/How\ to\ use.txt opencv-2.4.10/samples/python2/    
+ln Handcart-lift-rotary/Python/my_collage.py opencv-2.4.10/samples/python2/
+
+### make it executable
+~/opencv-2.4.10/samples/python2
+chmod +x digits_video_v2.py
+chmod +x facedetect_mio_detect_cyrcle.py
+chmod +x facedetect_mio.py
+chmod +x my_collage.py
+
+### install firmata library for comunication with Arduino
+sudo apt-get install arduino
+pip install pyfirmata
+
+
+
