@@ -48,6 +48,9 @@ cd build
 cmake -D CMAKE_BUILD_TYPE=RELEASE -D CMAKE_INSTALL_PREFIX=/usr/local -D BUILD_NEW_PYTHON_SUPPORT=ON -D INSTALL_C_EXAMPLES=ON -D INSTALL_PYTHON_EXAMPLES=ON  -D BUILD_EXAMPLES=ON ..
 
 make
+or if you want to use multicore capability during compiling thy with this other
+make -j3
+
 
 sudo make install  
 sudo ldconfig
