@@ -15,11 +15,13 @@ import cv2
 
 # TODO 
 # add parameter for video file, camera or raspicam
-# read the camera resolution capability and save into an array
-# moltiplicator must be connected with effective resolution change from FirstFase and SecondFase proportions
-# FirstFase must identify correctly the eye position (no false positive)
+# read the camera resolution capability and save into an array (actually on test)
+# moltiplicator must be connected with effective resolution change from FirstFase and SecondFase proportions (actualy on test)
+# FirstFase must identify correctly the eye position (no false positive) and select the eye to track
 # add recognition procerute (hug, nn, whatelse)
-# test improvement of multi core capability (probably we don't need this)
+# test improvement of multi core capability (probably we don't need this) (seems not possible for python to run in multicore cause GIL, butprobably haar can run in Multicore if correctly recompiled)
+# think about a routin to rotate image accordly with the face (eye) rotation
+
 # provide change of resolution of fase 1 and fase 2 as parameter (think about this)
 
 
@@ -37,10 +39,13 @@ ap.add_argument("-v", "--video", required = False,
 	help = "path to the video file, camera or raspicam")
 ap.add_argument("-o", "--static_optimization", required = True,
 	help = "True if you want static optimization")
+ap.add_argument("-e", "--eye", required = True,
+	help = "0 = Left or 1 = Right eye")
 args = vars(ap.parse_args())
 
 video_source = args["video"]
 usa_ottimizzazione_statica = (args["static_optimization"] == "True")
+eye_to_track = args["eye"] 
 
 # find video source (TODO)
 if video_source == "raspicam":
@@ -68,11 +73,13 @@ time.sleep(0.1)
 # capture frames from the webcam
 video_src = 0 # 0 = first webcam /dev/video0
 camera = cv2.VideoCapture(video_src)
-resolutions = ["high","mid","low","verylow"]
-
-resolution = resolutions.index("low")
-
 #    list of possible resolution to test with the camera
+resolutions = [('640.0', '480.0'), ('160.0', '120.0'), ('176.0', '144.0'), ('320.0', '176.0'), ('320.0', '240.0'), ('352.0', '288.0'), ('424.0', '240.0'), ('432.0', '240.0'), ('544.0', '288.0'), ('640.0', '360.0'), ('752.0', '416.0'), 
+    ('800.0', '448.0'), ('800.0', '600.0'), ('856.0', '480.0'), ('864.0', '480.0'), ('960.0', '544.0'), ('960.0', '720.0'), ('1024.0', '576.0'), ('1184.0', '656.0'), ('1280.0', '960.0')]
+
+
+
+
 #    160.0 x 120.0
 #    176.0 x 144.0
 #    320.0 x 240.0
@@ -83,22 +90,6 @@ resolution = resolutions.index("low")
 #    1280.0 x 1024.0
 #
 
-if resolution == 0:
-    camera.set(3,1280)
-    camera.set(4,960)
-    
-if resolution == 1:
-    camera.set(3,640)
-    camera.set(4,480)
-
-
-if resolution == 2:
-    camera.set(3,320)
-    camera.set(4,240)
-    
-if resolution == 3:
-    camera.set(3,160)
-    camera.set(4,120)
     
 number = 0
 r0 = 0
@@ -107,10 +98,32 @@ r2 = 0
 r3 = 0
 
 
+def set_res(cap, x,y):
+    cap.set(cv2.cv.CV_CAP_PROP_FRAME_WIDTH, int(x))
+    cap.set(cv2.cv.CV_CAP_PROP_FRAME_HEIGHT, int(y))
+    return float(cap.get(cv2.cv.CV_CAP_PROP_FRAME_WIDTH)),float(cap.get(cv2.cv.CV_CAP_PROP_FRAME_HEIGHT))
+    
+# use this to find resolution available take 10 minutes to run
+'''
+valArray = []
+for numx in range(100,1300,10):  #to iterate between 10 to 1300 step 10
+    for numy in range(100,1300,10):  #to iterate between 10 to 1300 step 10
+        print numx,numy
+        val = set_res(camera,numx,numy)
+        if val not in valArray:
+            valArray.append(val)
+print valArray
+'''
+
+w,h = resolutions[0] # '640.0', '480.0'
+
+fase1_resolution = set_res(camera,int(float(w)),int(float(h)))
+
+
 # debug
 print "fase 1 started"
 
-while number<10:
+while number<3:
 
     start = time.time()
 
@@ -131,12 +144,29 @@ while number<10:
     
     # loop over the eyes bounding boxes and draw them
     for rect in rects:
-        cv2.rectangle(frame, (rect[0], rect[1]), (rect[2], rect[3]), (0, 255, 0), 2)
-        r0 = rect[0]
-        r1 = rect[1]
-        r2 = rect[2]
-        r3 = rect[3]
-        number += 1
+        (h, w) = frame.shape[:2]
+        print rect[0],h,w
+        if eye_to_track == "0": # Left eye
+            if rect[0] <= w/2:
+            
+                cv2.rectangle(frame, (rect[0], rect[1]), (rect[2], rect[3]), (0, 255, 0), 2)
+                r0 = rect[0]
+                r1 = rect[1]
+                r2 = rect[2]
+                r3 = rect[3]
+                number += 1
+                print "left"
+        else: # Right eye
+            if rect[0] >= w/2:
+            
+                cv2.rectangle(frame, (rect[0], rect[1]), (rect[2], rect[3]), (0, 255, 0), 2)
+                r0 = rect[0]
+                r1 = rect[1]
+                r2 = rect[2]
+                r3 = rect[3]
+                number += 1
+                print "right"
+        
     
     # show the tracked eyes , then clear the
     # frame in preparation for the next frame
@@ -162,25 +192,12 @@ print "fase 1 ended"
 #rstart camera
 #camera = cv2.VideoCapture(0)
 
-resolution2 = resolutions.index("low")
+w,h = resolutions[6] # '424.0', '240.0'
+w,h = resolutions[6] # 
 
-if resolution2 == 0:
-    camera.set(3,1280)
-    camera.set(4,960)
-    
-if resolution2 == 1:
-    camera.set(3,640)
-    camera.set(4,480)
+fase2_resolution = set_res(camera,int(float(w)),int(float(h)))
 
 
-if resolution2 == 2:
-    camera.set(3,320)
-    camera.set(4,240)
-    
-if resolution2 == 3:
-    camera.set(3,160)
-    camera.set(4,120)
-    
 min_rect = r2/3*2
 old_end = 1.0
 old_number = number
@@ -189,7 +206,7 @@ best_minrect_array = [0] * 500
 
 print "fase 2 started"
 
-while number<100:
+while number<70:
     start = time.time()
     (grabbed, image) = camera.read()
     # grab the raw NumPy array representing the image
@@ -201,11 +218,15 @@ while number<100:
     #frame = image[r0:r2 , r1:r3]
     #frame = image[r0:r2 , r1:r3]
     tollerance = 0.5
-    moltiplicator = 1
-    rr0 = int(r0*(1-tollerance)) * moltiplicator
-    rr1 = int(r1*(1-tollerance)) * moltiplicator
-    rr2 = int(r2*(1+tollerance)) * moltiplicator
-    rr3 = int(r3*(1+tollerance)) * moltiplicator
+    moltiplicator_w = fase2_resolution[0] / fase1_resolution[0]
+    moltiplicator_h = fase2_resolution[1] / fase1_resolution[1]
+    
+    
+    rr0 = int(int(r0*(1-tollerance)) * moltiplicator_w)
+    rr1 = int(int(r1*(1-tollerance)) * moltiplicator_h)
+    rr2 = int(int(r2*(1+tollerance)) * moltiplicator_w)
+    rr3 = int(int(r3*(1+tollerance)) * moltiplicator_h)
+    
     #print "ok",r0,r1,r2,r3
     
     frame = image[rr1:rr3 , rr0:rr2]
@@ -275,21 +296,31 @@ print best_min_rect
 # release resource 
 best_minrect_array = []
 
-if number_of_good_min_rect > 25:
+if number_of_good_min_rect > 15:
     #now i have a good reason to use best_min_rect as my min_rect
     print "fase 3 started"
     
     #setting of all the variable
     min_rect = best_min_rect
     tollerance = 0.5
-    moltiplicator = 1 # it depends on the different resolution from fase 1 and fase 2
-    rr0 = int(r0*(1-tollerance)) * moltiplicator
-    rr1 = int(r1*(1-tollerance)) * moltiplicator
-    rr2 = int(r2*(1+tollerance)) * moltiplicator
-    rr3 = int(r3*(1+tollerance)) * moltiplicator
-    while True:
+    moltiplicator_w = fase2_resolution[0] / fase1_resolution[0]
+    moltiplicator_h = fase2_resolution[1] / fase1_resolution[1]
+    
+    rr0 = int(int(r0*(1-tollerance)) * moltiplicator_w)
+    rr1 = int(int(r1*(1-tollerance)) * moltiplicator_h)
+    rr2 = int(int(r2*(1+tollerance)) * moltiplicator_w)
+    rr3 = int(int(r3*(1+tollerance)) * moltiplicator_h)
+    
+    accuracy_monitor = True
+    eye_frames = 0.0
+    partial_frame_number = 0.0
+    quality = 0.0
+    while accuracy_monitor:
         
         start = time.time()
+        
+        partial_frame_number +=1 #increment every new frame 
+        
         (grabbed, image) = camera.read()
         
         # check to see if we have reached the end of the video in case of video file
@@ -308,6 +339,7 @@ if number_of_good_min_rect > 25:
         # loop over the face bounding boxes and draw them
         for rect in rects:
             cv2.rectangle(frame, (rect[0], rect[1]), (rect[2], rect[3]), (0, 255, 0), 2)
+            eye_frames +=1
             print "eye located"
 
         # show the tracked eyes
@@ -319,8 +351,18 @@ if number_of_good_min_rect > 25:
         
         # todo
         # find where you still looking (right, left, center)
-        
-        
+        if partial_frame_number > 50:
+            print "check!"
+            if eye_frames > 1.0:
+                quality = eye_frames/partial_frame_number
+                eye_frames = 0.0
+                partial_frame_number = 0.0
+                if quality < 0.9:
+                    accuracy_monitor = False
+                    print "the accuracy is too low", quality
+            else:
+                accuracy_monitor = False
+                print "the accuracy is too low no frame in last check!", quality
         # if the 'q' key is pressed, stop the loop
         if cv2.waitKey(1) & 0xFF == ord("q"):
             break
